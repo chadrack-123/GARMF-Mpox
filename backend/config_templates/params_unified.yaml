@@ -1,0 +1,108 @@
+# Unified Pipeline Configuration Template (Mixed Modality)
+
+# Study Information
+study:
+  id: 1
+  title: "Multi-modal Mpox Detection Study"
+  modality: "mixed"
+
+# Datasets
+datasets:
+  tabular:
+    id: 1
+    storage_uri: "data/datasets/mpox_clinical.csv"
+    target_column: "diagnosis"
+  
+  imaging:
+    id: 2
+    storage_uri: "data/datasets/mpox_images"
+
+# Models
+models:
+  tabular:
+    type: "xgboost"
+    hyperparameters:
+      n_estimators: 100
+      max_depth: 6
+      learning_rate: 0.1
+  
+  imaging:
+    type: "resnet18"
+    hyperparameters:
+      image_size: 224
+      batch_size: 32
+      num_epochs: 10
+      learning_rate: 0.001
+  
+  fusion:
+    enabled: true
+    method: "late_fusion"  # Options: late_fusion, early_fusion
+    weights:
+      tabular: 0.5
+      imaging: 0.5
+
+# Preprocessing
+preprocessing:
+  tabular:
+    imputation: "mean"
+    encoding: "label"
+    scaling: "standard"
+    oversampling:
+      enabled: false
+      method: "smote"
+  
+  imaging:
+    resize: 224
+    normalize: "imagenet"
+    augmentation:
+      enabled: false
+
+# Data Splitting
+split_strategy: "stratified"
+test_size: 0.2
+validation_size: 0.1
+
+# Random Seeds
+random_seed: 42
+
+# Metrics
+metrics:
+  - "accuracy"
+  - "f1_score"
+  - "auc"
+  - "precision"
+  - "recall"
+
+# XAI Configuration
+xai:
+  enabled: true
+  tabular_method: "shap"
+  imaging_method: "gradcam"
+  max_samples: 50
+
+# GenAI Settings
+genai:
+  synthetic_augmentation:
+    tabular:
+      enabled: false
+      method: "smote"
+    imaging:
+      enabled: false
+      method: "standard"
+  
+  code_generation:
+    enabled: false
+    description: "Multi-modal mpox detection system"
+
+# Environment
+environment:
+  python_version: "3.11"
+  cuda_version: "11.8"
+
+# Reproducibility
+reproducibility:
+  deterministic: true
+  log_environment: true
+  compute_data_checksum: true
+  save_split_indices: true
+  container_digest: null

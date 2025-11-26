@@ -1,0 +1,98 @@
+# Tabular Pipeline Configuration Template
+
+# Dataset Configuration
+dataset:
+  id: 1  # Dataset ID from database
+  type: "tabular"
+  storage_uri: "data/datasets/mpox_tabular.csv"
+  target_column: "diagnosis"
+
+# Model Configuration
+model: "random_forest"  # Options: random_forest, xgboost, lightgbm
+
+# Preprocessing
+preprocessing:
+  imputation:
+    strategy: "mean"  # Options: mean, median, most_frequent
+  
+  encoding:
+    method: "label"  # Options: label, onehot
+    
+  scaling:
+    method: "standard"  # Options: standard, minmax, robust
+  
+  feature_selection:
+    enabled: false
+    method: "mutual_info"
+    k_features: 10
+
+# Oversampling (for imbalanced data)
+oversampling:
+  enabled: false
+  method: "smote"  # Options: smote, smote_tomek, adasyn
+  target_ratio: 1.0
+  minority_multiplier: null
+
+# Hyperparameters
+hyperparameters:
+  random_forest:
+    n_estimators: 100
+    max_depth: null
+    min_samples_split: 2
+    min_samples_leaf: 1
+  
+  xgboost:
+    n_estimators: 100
+    max_depth: 6
+    learning_rate: 0.1
+    subsample: 0.8
+  
+  lightgbm:
+    n_estimators: 100
+    max_depth: -1
+    learning_rate: 0.1
+    num_leaves: 31
+
+# Data Splitting
+split_strategy: "stratified"
+test_size: 0.2
+validation_size: null
+
+# Random Seeds (for reproducibility)
+random_seed: 42
+
+# Metrics to Compute
+metrics:
+  - "accuracy"
+  - "precision"
+  - "recall"
+  - "f1_score"
+  - "auc"
+
+# XAI Configuration
+xai:
+  enabled: true
+  method: "shap"
+  max_samples: 100  # Max samples to explain
+
+# GenAI Settings
+genai:
+  synthetic_augmentation:
+    enabled: false
+    method: "smote"
+    target_ratio: 1.0
+  
+  code_generation:
+    enabled: false
+    description: "Tabular classification for mpox risk prediction"
+
+# Environment Specification
+environment:
+  python_version: "3.11"
+  
+# Reproducibility Settings
+reproducibility:
+  deterministic: true
+  log_environment: true
+  compute_data_checksum: true
+  save_split_indices: true

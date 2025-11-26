@@ -1,0 +1,68 @@
+# Imaging Pipeline Configuration Template
+
+# Dataset Configuration
+dataset:
+  id: 1  # Dataset ID from database
+  type: "image"
+  storage_uri: "data/datasets/mpox_images"
+  
+# Model Configuration
+model: "resnet18"  # Options: resnet18, densenet201, vit
+
+# Image Processing
+image_size: 224
+preprocessing:
+  - "resize"
+  - "normalize_imagenet"
+
+# Training Parameters
+hyperparameters:
+  batch_size: 32
+  num_epochs: 10
+  learning_rate: 0.001
+  optimizer: "adam"
+
+# Data Splitting
+split_strategy: "stratified"
+test_size: 0.2
+validation_size: 0.1
+
+# Random Seeds (for reproducibility)
+random_seed: 42
+
+# Metrics to Compute
+metrics:
+  - "accuracy"
+  - "f1_score"
+  - "auc"
+  - "precision"
+  - "recall"
+
+# XAI Configuration
+xai:
+  enabled: true
+  method: "gradcam"
+  num_samples: 5  # Number of sample images to explain
+
+# GenAI Settings
+genai:
+  synthetic_augmentation:
+    enabled: false
+    method: "standard"  # Options: standard, gan, diffusion
+    balance_to_max: true
+  
+  code_generation:
+    enabled: false
+    description: "Image classification for mpox detection"
+
+# Environment Specification
+environment:
+  python_version: "3.11"
+  cuda_version: "11.8"  # Set to null if CPU only
+  
+# Reproducibility Settings
+reproducibility:
+  deterministic: true
+  log_environment: true
+  compute_data_checksum: true
+  save_split_indices: true
