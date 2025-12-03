@@ -15,13 +15,14 @@
     "@mui/icons-material": "^5.15.0",
     "@mui/material": "^5.15.0",
     "@tanstack/react-query": "^5.14.2",
-    "axios": "^1.6.2",
+    "axios": "^1.13.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.1",
     "yaml": "^2.3.4"
   },
   "devDependencies": {
+    "@types/axios": "^0.9.36",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@typescript-eslint/eslint-plugin": "^6.14.0",

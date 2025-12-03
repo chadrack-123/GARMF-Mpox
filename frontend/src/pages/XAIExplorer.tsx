@@ -6,11 +6,21 @@ import { getRunXAI } from '../api/client'
 export default function XAIExplorer() {
   const { runId } = useParams<{ runId: string }>()
 
-  const { data: xaiArtefacts } = useQuery({
+  type XAIArtefact = {
+    id: number
+    path: string
+    metadata?: {
+      type?: string
+      [key: string]: any
+    }
+    [key: string]: any
+  }
+
+  const { data: xaiArtefacts } = useQuery<XAIArtefact[]>({
     queryKey: ['xai', runId],
     queryFn: async () => {
       const response = await getRunXAI(Number(runId))
-      return response.data
+      return response.data as XAIArtefact[]
     },
   })
 

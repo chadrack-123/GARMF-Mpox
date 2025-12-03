@@ -11,32 +11,68 @@ import {
 import { useState } from 'react'
 import { getStudy, getStudyDatasets, getStudyConfigs } from '../api/client'
 
+type Study = {
+  id: number
+  title: string
+  disease: string
+  modality: string
+  doi?: string
+  citation?: string
+}
+
+type Dataset = {
+  id: number
+  type: string
+  storage_uri: string
+}
+
+type Config = {
+  id: number
+  name: string
+  config_type: string
+}
+
 export default function StudyDetail() {
   const { studyId } = useParams<{ studyId: string }>()
   const [tab, setTab] = useState(0)
 
-  const { data: study } = useQuery({
-    queryKey: ['study', studyId],
+  // Safely handle studyId possibly being undefined
+  const numericStudyId = studyId ? Number(studyId) : undefined
+
+  const { data: study } = useQuery<Study>({
+    queryKey: ['study', numericStudyId],
     queryFn: async () => {
-      const response = await getStudy(Number(studyId))
-      return response.data
+      if (!numericStudyId) {
+        throw new Error('No studyId provided')
+      }
+      const response = await getStudy(numericStudyId)
+      return response.data as Study
     },
+    enabled: !!numericStudyId,
   })
 
-  const { data: datasets } = useQuery({
-    queryKey: ['datasets', studyId],
+  const { data: datasets } = useQuery<Dataset[]>({
+    queryKey: ['datasets', numericStudyId],
     queryFn: async () => {
-      const response = await getStudyDatasets(Number(studyId))
-      return response.data
+      if (!numericStudyId) {
+        throw new Error('No studyId provided')
+      }
+      const response = await getStudyDatasets(numericStudyId)
+      return response.data as Dataset[]
     },
+    enabled: !!numericStudyId,
   })
 
-  const { data: configs } = useQuery({
-    queryKey: ['configs', studyId],
+  const { data: configs } = useQuery<Config[]>({
+    queryKey: ['configs', numericStudyId],
     queryFn: async () => {
-      const response = await getStudyConfigs(Number(studyId))
-      return response.data
+      if (!numericStudyId) {
+        throw new Error('No studyId provided')
+      }
+      const response = await getStudyConfigs(numericStudyId)
+      return response.data as Config[]
     },
+    enabled: !!numericStudyId,
   })
 
   return (
@@ -46,7 +82,10 @@ export default function StudyDetail() {
       </Typography>
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <Tabs value={tab} onChange={(_, v) => setTab(v)}>
+        <Tabs
+          value={tab}
+          onChange={(_event, newValue: number) => setTab(newValue)}
+        >
           <Tab label="Overview" />
           <Tab label="Datasets" />
           <Tab label="Configs" />
@@ -61,7 +100,9 @@ export default function StudyDetail() {
           </Typography>
           <Typography><strong>Disease:</strong> {study?.disease}</Typography>
           <Typography><strong>Modality:</strong> {study?.modality}</Typography>
-          {study?.doi && <Typography><strong>DOI:</strong> {study.doi}</Typography>}
+          {study?.doi && (
+            <Typography><strong>DOI:</strong> {study.doi}</Typography>
+          )}
           {study?.citation && (
             <Box sx={{ mt: 2 }}>
               <Typography variant="subtitle2">Citation:</Typography>
@@ -74,10 +115,13 @@ export default function StudyDetail() {
       {tab === 1 && (
         <Paper sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
-            Datasets ({datasets?.length || 0})
+            Datasets ({datasets?.length ?? 0})
           </Typography>
-          {datasets?.map((dataset: any) => (
-            <Box key={dataset.id} sx={{ mb: 2, p: 2, border: '1px solid #ddd', borderRadius: 1 }}>
+          {datasets?.map((dataset) => (
+            <Box
+              key={dataset.id}
+              sx={{ mb: 2, p: 2, border: '1px solid #ddd', borderRadius: 1 }}
+            >
               <Typography><strong>Type:</strong> {dataset.type}</Typography>
               <Typography><strong>URI:</strong> {dataset.storage_uri}</Typography>
             </Box>
@@ -88,10 +132,13 @@ export default function StudyDetail() {
       {tab === 2 && (
         <Paper sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
-            Configurations ({configs?.length || 0})
+            Configurations ({configs?.length ?? 0})
           </Typography>
-          {configs?.map((config: any) => (
-            <Box key={config.id} sx={{ mb: 2, p: 2, border: '1px solid #ddd', borderRadius: 1 }}>
+          {configs?.map((config) => (
+            <Box
+              key={config.id}
+              sx={{ mb: 2, p: 2, border: '1px solid #ddd', borderRadius: 1 }}
+            >
               <Typography><strong>Name:</strong> {config.name}</Typography>
               <Typography><strong>Type:</strong> {config.config_type}</Typography>
             </Box>
